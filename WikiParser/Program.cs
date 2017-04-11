@@ -44,12 +44,15 @@ namespace WikiParser
 		public static void Check(FileStream fs, HashSet<string> words, long start, int len)
 		{
 			var s = Read(fs, start, len);
+			//Log.Debug(s);
 
 			var r = new Regex(@"[А-Яа-яЁё]+");
 			var m = r.Matches(s);
 			foreach (Match j in m)
 			{
-				words.Add(j.Value);
+				words.Add(ToLower(j.Value));
+				//if (words.Add(ToLower(j.Value)))
+				//	Log.Debug(ToLower(j.Value));
 			}
 		}
 
@@ -61,6 +64,11 @@ namespace WikiParser
 		public static void Main(string[] args)
 		{
 			new Program();
+		}
+
+		public static string ToLower(string s)
+		{
+			return s.ToLower().Replace('ё', 'е');
 		}
 
 		public Program()
@@ -89,6 +97,7 @@ namespace WikiParser
 			for (var i = Config.StartAuto; i < Config.End; i += Config.Step)
 			{
 				Find(i, Config.Step + Config.Reserve);
+				Log.Trace($"{i} {Config.Step + Config.Reserve} {Words.Count}");
 			}
 		}
 	}

@@ -2,7 +2,7 @@
 	"File": "\\\\Netbook-acer\\вики\\ruwiki-20170401-pages-articles-multistream.xml",
 	"Start": 0,
 	"StartAuto": 0,
-	"End": 1000,
-	"Step": 100,
-	"Reserve": 20
+	"End": 10000000,
+	"Step": 5000000,
+	"Reserve": 100
 }
