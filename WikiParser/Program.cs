@@ -41,24 +41,25 @@ namespace WikiParser
 
 		public FileStream Wiki { get; set; }
 
-		public static int FindStatic(FileStream fs, HashSet<string> words, long start, int len)
+		public static List<string> FindStatic(FileStream fs, HashSet<string> words, long start, int len)
 		{
 			var s = Read(fs, start, len);
 			//Log.Debug(s);
 
 			var r = new Regex(@"[А-Яа-яЁё]+");
 			var m = r.Matches(s);
-			var c = 0;
+			var l = new List<string>();
 			foreach (Match j in m)
 			{
 				//words.Add(ToLower(j.Value));
-				if (words.Add(ToLower(j.Value)))
-					c++;
+				var i = ToLower(j.Value);
+				if (words.Add(i))
+					l.Add(i);
 			}
-			return c;
+			return l;
 		}
 
-		public int Find(long start, int len)
+		public List<string> Find(long start, int len)
 		{
 			return FindStatic(Wiki, Words, start, len);
 		}
@@ -75,7 +76,8 @@ namespace WikiParser
 
 		public Program()
 		{
-			LogManager.Configuration.Variables["starttime"] = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss-ffff");
+			var starttime = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss-ffff");
+			LogManager.Configuration.Variables["starttime"] = starttime;
 
 			using (var sr = new StreamReader("config.json", true))
 			{
@@ -96,11 +98,18 @@ namespace WikiParser
 			var a = 18219425131;
 			var h = (double)a / c;
 
+			Directory.CreateDirectory("starts");
+			Directory.CreateDirectory($"starts\\{starttime}");
+
 			for (var i = Config.StartAuto; i < Config.End; i += Config.Step)
 			{
 				Log.Trace($"Начат анализ от {i} до {i + Config.Step + Config.Reserve}");
 				var f = Find(i, Config.Step + Config.Reserve);
-				Log.Trace($"Найдено {f} новых слов, всего {Words.Count}");
+				Log.Trace($"Найдено {f.Count} новых слов, всего {Words.Count}");
+				using (var sw = new StreamWriter($"starts\\{starttime}\\{i} {i + Config.Step + Config.Reserve}.txt"))
+				{
+					sw.WriteLine(f.Aggregate("", (current, j) => current + (j + "\r\n")));
+				}
 			}
 		}
 	}
