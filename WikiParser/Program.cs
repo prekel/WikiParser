@@ -98,9 +98,9 @@ namespace WikiParser
 
 			for (var i = Config.StartAuto; i < Config.End; i += Config.Step)
 			{
-				Log.Trace($"Начат анализ от {i}");
+				Log.Trace($"Начат анализ от {i} до {i + Config.Step + Config.Reserve}");
 				var f = Find(i, Config.Step + Config.Reserve);
-				Log.Trace($"Найдено {f} слов, всего {Words.Count}");
+				Log.Trace($"Найдено {f} новых слов, всего {Words.Count}");
 			}
 		}
 	}
