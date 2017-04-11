@@ -41,24 +41,26 @@ namespace WikiParser
 
 		public FileStream Wiki { get; set; }
 
-		public static void Check(FileStream fs, HashSet<string> words, long start, int len)
+		public static int FindStatic(FileStream fs, HashSet<string> words, long start, int len)
 		{
 			var s = Read(fs, start, len);
 			//Log.Debug(s);
 
 			var r = new Regex(@"[А-Яа-яЁё]+");
 			var m = r.Matches(s);
+			var c = 0;
 			foreach (Match j in m)
 			{
-				words.Add(ToLower(j.Value));
-				//if (words.Add(ToLower(j.Value)))
-				//	Log.Debug(ToLower(j.Value));
+				//words.Add(ToLower(j.Value));
+				if (words.Add(ToLower(j.Value)))
+					c++;
 			}
+			return c;
 		}
 
-		public void Find(long start, int len)
+		public int Find(long start, int len)
 		{
-			Check(Wiki, Words, start, len);
+			return FindStatic(Wiki, Words, start, len);
 		}
 
 		public static void Main(string[] args)
@@ -96,8 +98,9 @@ namespace WikiParser
 
 			for (var i = Config.StartAuto; i < Config.End; i += Config.Step)
 			{
-				Find(i, Config.Step + Config.Reserve);
-				Log.Trace($"{i} {Config.Step + Config.Reserve} {Words.Count}");
+				Log.Trace($"Начат анализ от {i}");
+				var f = Find(i, Config.Step + Config.Reserve);
+				Log.Trace($"Найдено {f} слов, всего {Words.Count}");
 			}
 		}
 	}
