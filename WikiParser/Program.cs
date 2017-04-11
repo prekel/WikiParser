@@ -72,11 +72,12 @@ namespace WikiParser
 				Config = JsonConvert.DeserializeObject<Configuration>(sr.ReadToEnd());
 			}
 			Log.Info("Загружена конфигурация");
-			Log.Debug($"File = {Config.File}");
+			Log.Debug($"File =      {Config.File}");
 			Log.Debug($"Start =     {Config.Start}");
 			Log.Debug($"StartAuto = {Config.Start}");
 			Log.Debug($"End =       {Config.End}");
 			Log.Debug($"Step =      {Config.Step}");
+			Log.Debug($"Reserve =   {Config.Reserve}");
 
 			Wiki = new FileStream(Config.File, FileMode.Open);
 			Words = new HashSet<string>();
