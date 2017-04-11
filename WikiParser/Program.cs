@@ -17,57 +17,78 @@ namespace WikiParser
 	{
 		private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-		public class Config
+		public class Configuration
 		{
-			public string File;
-			public long Start;
-			public long StartAuto;
-			public long End;
-			public int Step;
+			public string File { get; set; }
+			public long Start { get; set; }
+			public long StartAuto { get; set; }
+			public long End { get; set; }
+			public int Step { get; set; }
+			public int Reserve { get; set; }
 		}
 
-		public static Config Conf { get; set; }
-		public static Config Conf1 { get; set; }
+		public Configuration Config { get; set; }
 
-		public static string Read(FileStream r, long start, int len)
+		public static string Read(FileStream fs, long start, int len)
 		{
-			r.Position = start;
+			fs.Position = start;
 			var buff = new byte[len];
-			var l = r.Read(buff, 0, len);
+			var l = fs.Read(buff, 0, len);
 			return Encoding.UTF8.GetString(buff, 0, l);
 		}
 
+		public HashSet<string> Words { get; set; }
+
+		public FileStream Wiki { get; set; }
+
+		public static void Check(FileStream fs, HashSet<string> words, long start, int len)
+		{
+			var s = Read(fs, start, len);
+
+			var r = new Regex(@"[А-Яа-яЁё]+");
+			var m = r.Matches(s);
+			foreach (Match j in m)
+			{
+				words.Add(j.Value);
+			}
+		}
+
+		public void Find(long start, int len)
+		{
+			Check(Wiki, Words, start, len);
+		}
+
 		public static void Main(string[] args)
+		{
+			new Program();
+		}
+
+		public Program()
 		{
 			LogManager.Configuration.Variables["starttime"] = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss-ffff");
 
 			using (var sr = new StreamReader("config.json", true))
 			{
-				Conf = JsonConvert.DeserializeObject<Config>(sr.ReadToEnd());
+				Config = JsonConvert.DeserializeObject<Configuration>(sr.ReadToEnd());
 			}
 			Log.Info("Загружена конфигурация");
-			Log.Debug($"File = {Conf.File}");
-			Log.Debug($"Start =     {Conf.Start}");
-			Log.Debug($"StartAuto = {Conf.Start}");
-			Log.Debug($"End =       {Conf.End}");
-			Log.Debug($"Step =      {Conf.Step}");
+			Log.Debug($"File = {Config.File}");
+			Log.Debug($"Start =     {Config.Start}");
+			Log.Debug($"StartAuto = {Config.Start}");
+			Log.Debug($"End =       {Config.End}");
+			Log.Debug($"Step =      {Config.Step}");
 
-			var time = new Stopwatch();
-
-			var wiki = new FileStream(@"\\Netbook-acer\вики\ruwiki-20170401-pages-articles-multistream.xml", FileMode.Open);
+			Wiki = new FileStream(Config.File, FileMode.Open);
+			Words = new HashSet<string>();
 
 			var c = 18219426;
 			var a = 18219425131;
 			var h = (double)a / c;
 
-			time.Start();
-			var s = Read(wiki, 0, c);
-			
-			var r = new Regex(@"[А-Яа-яЁё]+");
-			var m = r.Matches(s);
-			var n = m.Count;
-			Console.WriteLine($"{n} {time.Elapsed} {time.ElapsedMilliseconds}");
-			Console.ReadLine();
+			for (var i = Config.StartAuto; i < Config.End; i += Config.Step)
+			{
+				Find(i, Config.Step + Config.Reserve);
+			}
 		}
 	}
 }

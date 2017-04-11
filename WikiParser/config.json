@@ -3,5 +3,6 @@
 	"Start": 0,
 	"StartAuto": 0,
 	"End": 1000,
-	"Step": 100
+	"Step": 100,
+	"Reserve": 20
 }
