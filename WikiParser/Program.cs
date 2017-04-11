@@ -8,10 +8,15 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 
+using Newtonsoft.Json;
+using NLog;
+
 namespace WikiParser
 {
 	public class Program
 	{
+		private readonly Logger Log = LogManager.GetCurrentClassLogger();
+
 		public static string Read(FileStream r, long start, int len)
 		{
 			r.Position = start;
