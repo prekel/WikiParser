@@ -17,6 +17,16 @@ namespace WikiParser
 	{
 		private readonly Logger Log = LogManager.GetCurrentClassLogger();
 
+		public class Config
+		{
+			public long Start;
+			public long End;
+			public string File;
+		}
+
+		public static Config Conf { get; set; }
+		public static Config Conf1 { get; set; }
+
 		public static string Read(FileStream r, long start, int len)
 		{
 			r.Position = start;
@@ -29,6 +39,10 @@ namespace WikiParser
 		{
 			//var wiki = new XmlDocument();
 			//wiki.Load("jbowiki-20170401-pages-articles-multistream.xml");
+
+			Conf1 = new Config { Start = 0, End = 100, File = @"\\Netbook-acer\вики\ruwiki-20170401-pages-articles-multistream.xml" };
+			var str = JsonConvert.SerializeObject(Conf1);
+			Conf = JsonConvert.DeserializeObject<Config>(str);
 
 			var time = new Stopwatch();
 
