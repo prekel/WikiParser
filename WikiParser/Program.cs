@@ -15,13 +15,15 @@ namespace WikiParser
 {
 	public class Program
 	{
-		private readonly Logger Log = LogManager.GetCurrentClassLogger();
+		private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
 		public class Config
 		{
-			public long Start;
-			public long End;
 			public string File;
+			public long Start;
+			public long StartAuto;
+			public long End;
+			public int Step;
 		}
 
 		public static Config Conf { get; set; }
@@ -37,12 +39,18 @@ namespace WikiParser
 
 		public static void Main(string[] args)
 		{
-			//var wiki = new XmlDocument();
-			//wiki.Load("jbowiki-20170401-pages-articles-multistream.xml");
+			LogManager.Configuration.Variables["starttime"] = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss-ffff");
 
-			Conf1 = new Config { Start = 0, End = 100, File = @"\\Netbook-acer\вики\ruwiki-20170401-pages-articles-multistream.xml" };
-			var str = JsonConvert.SerializeObject(Conf1);
-			Conf = JsonConvert.DeserializeObject<Config>(str);
+			using (var sr = new StreamReader("config.json", true))
+			{
+				Conf = JsonConvert.DeserializeObject<Config>(sr.ReadToEnd());
+			}
+			Log.Info("Загружена конфигурация");
+			Log.Debug($"File = {Conf.File}");
+			Log.Debug($"Start =     {Conf.Start}");
+			Log.Debug($"StartAuto = {Conf.Start}");
+			Log.Debug($"End =       {Conf.End}");
+			Log.Debug($"Step =      {Conf.Step}");
 
 			var time = new Stopwatch();
 
