@@ -79,7 +79,7 @@ namespace WikiParser
 			var starttime = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss-ffff");
 			LogManager.Configuration.Variables["starttime"] = starttime;
 
-			using (var sr = new StreamReader("config.json", true))
+			using (var sr = new StreamReader("config.json"))
 			{
 				Config = JsonConvert.DeserializeObject<Configuration>(sr.ReadToEnd());
 			}
@@ -97,6 +97,8 @@ namespace WikiParser
 			var c = 18219426;
 			var a = 18219425131;
 			var h = (double)a / c;
+
+			var c1 = 20000000;
 
 			Directory.CreateDirectory("starts");
 			Directory.CreateDirectory($"starts\\{starttime}");
@@ -125,6 +127,14 @@ namespace WikiParser
 				t.Start();
 			}
 			Task.WaitAll(tasks.ToArray());
+
+			Log.Info($"Анализ закончен, найдено {Words.Count} слов");
+
+			using (var sw = new StreamWriter("config.json"))
+			{
+				Config.StartAuto = Config.End;
+				sw.Write(JsonConvert.SerializeObject(Config));
+			}
 		}
 	}
 }
