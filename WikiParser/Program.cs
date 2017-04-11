@@ -101,16 +101,30 @@ namespace WikiParser
 			Directory.CreateDirectory("starts");
 			Directory.CreateDirectory($"starts\\{starttime}");
 
+			var tasks = new List<Task>();
+
 			for (var i = Config.StartAuto; i < Config.End; i += Config.Step)
 			{
 				Log.Trace($"Начат анализ от {i} до {i + Config.Step + Config.Reserve}");
 				var f = Find(i, Config.Step + Config.Reserve);
 				Log.Trace($"Найдено {f.Count} новых слов, всего {Words.Count}");
-				using (var sw = new StreamWriter($"starts\\{starttime}\\{i} {i + Config.Step + Config.Reserve}.txt"))
+				var t = new Task(() =>
 				{
-					sw.WriteLine(f.Aggregate("", (current, j) => current + (j + "\r\n")));
-				}
+					var p = $"starts\\{starttime}\\{i} {i + Config.Step + Config.Reserve}.txt";
+					using (var sw = new StreamWriter(p))
+					{
+						Log.Trace($"Начата запись в    {p}");
+						foreach (var j in f)
+						{
+							sw.WriteLine(j);
+						}
+						Log.Trace($"Закончена запись в {p}");
+					}
+				});
+				tasks.Add(t);
+				t.Start();
 			}
+			Task.WaitAll(tasks.ToArray());
 		}
 	}
 }
